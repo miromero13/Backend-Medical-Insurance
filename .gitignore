@@ -1,0 +1,51 @@
+# Logs
+*.log
+*.log.*
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Temporary files
+*.class
+*.jar
+*.war
+*.ear
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+*.env
+.env.*
+
+# Generated files
+out/
+bin/
+target/
+
+# Spring Boot specific
+*.db
+*.h2.db
+*.mv.db
+*.sql
+
+# Node.js (if applicable)
+node_modules/
+
+# Ignore volumes and data
+postgres-data/
+
+# Environment-specific
+.env
+*.env.local
