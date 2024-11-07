@@ -10,7 +10,7 @@ WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 
 # Expone el puerto que usará la aplicación
-EXPOSE 8090
+EXPOSE 8080
 
 # Comando para ejecutar la aplicación Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
