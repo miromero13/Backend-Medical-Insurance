@@ -49,3 +49,6 @@ postgres-data/
 # Environment-specific
 .env
 *.env.local
+
+# Docker
+docker-compose.yml
