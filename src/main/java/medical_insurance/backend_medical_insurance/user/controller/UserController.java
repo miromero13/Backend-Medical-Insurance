@@ -17,7 +17,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/users")
-@Tag(name = "Users", description = "API for managing users")
+@Tag(name = "Users")
 public class UserController {
 
     @Autowired

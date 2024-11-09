@@ -1,7 +1,7 @@
 package medical_insurance.backend_medical_insurance.user.service;
 
-import medical_insurance.backend_medical_insurance.inventory.entity.BranchEntity;
-import medical_insurance.backend_medical_insurance.inventory.service.BranchService;
+import medical_insurance.backend_medical_insurance.hospital.entity.BranchEntity;
+import medical_insurance.backend_medical_insurance.hospital.service.BranchService;
 import medical_insurance.backend_medical_insurance.user.dto.CreateUserDto;
 import medical_insurance.backend_medical_insurance.user.dto.UpdateUserDto;
 import medical_insurance.backend_medical_insurance.user.entity.RoleEntity;
