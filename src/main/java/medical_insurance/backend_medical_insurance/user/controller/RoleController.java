@@ -16,39 +16,39 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/roles")
-@Tag(name = "Roles", description = "API for managing roles")
+@Tag(name = "Roles")
 public class RoleController {
 
     @Autowired
     private RoleService roleService;
 
-    @Operation(summary = "Create a new role")
+    @Operation()
     @PostMapping
     public ResponseEntity<ResponseMessage<RoleEntity>> createRole(@RequestBody CreateRoleDto createRoleDto) {
         return ResponseEntity
                 .ok(ResponseMessage.success(roleService.createRole(createRoleDto), "Role created successfully", 1));
     }
 
-    @Operation(summary = "Get all roles")
+    @Operation()
     @GetMapping
     public ResponseEntity<ResponseMessage<List<RoleEntity>>> getAllRoles() {
         return ResponseEntity.ok(roleService.getAllRoles());
     }
 
-    @Operation(summary = "Update an existing role")
+    @Operation()
     @PutMapping("/{id}")
     public ResponseEntity<ResponseMessage<RoleEntity>> updateRole(@PathVariable UUID id,
             @RequestBody UpdateRoleDto updateRoleDto) {
         return ResponseEntity.ok(roleService.updateRole(id, updateRoleDto));
     }
 
-    @Operation(summary = "Get a role by ID")
+    @Operation()
     @GetMapping("/{id}")
     public ResponseEntity<ResponseMessage<RoleEntity>> getRoleById(@PathVariable UUID id) {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
-    @Operation(summary = "Delete a role by ID")
+    @Operation()
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseMessage<Void>> deleteRole(@PathVariable UUID id) {
         return ResponseEntity.ok(roleService.deleteRole(id));

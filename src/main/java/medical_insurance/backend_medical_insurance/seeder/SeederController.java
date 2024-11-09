@@ -1,8 +1,9 @@
 package medical_insurance.backend_medical_insurance.seeder;
 
-import medical_insurance.backend_medical_insurance.inventory.dto.*;
-import medical_insurance.backend_medical_insurance.inventory.entity.*;
-import medical_insurance.backend_medical_insurance.inventory.service.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import medical_insurance.backend_medical_insurance.hospital.dto.*;
+import medical_insurance.backend_medical_insurance.hospital.entity.*;
+import medical_insurance.backend_medical_insurance.hospital.service.*;
 import medical_insurance.backend_medical_insurance.user.dto.CreateRoleDto;
 import medical_insurance.backend_medical_insurance.user.dto.CreateUserDto;
 import medical_insurance.backend_medical_insurance.user.entity.RoleEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "Seeder")
 public class SeederController {
 
   @Autowired

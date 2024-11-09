@@ -45,7 +45,7 @@ public class SecurityConfig {
                         // Permitir acceso sin autenticación a las rutas de Swagger
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
                                 "/client/auth/login/whatsapp", "/client/auth/login/email", "/auth/login", "/auth**",
-                                "/public/seeder", "/client/", "/files/image", "/files/**")
+                                "/public/seeder", "/client/")
 
                         .permitAll()
                         // proteger endpoints con permisos específicos

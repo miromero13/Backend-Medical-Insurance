@@ -23,7 +23,7 @@ public class SwaggerConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")))
                 .info(new Info()
-                        .title("Documentación de la API de Ecommerce")
+                        .title("Documentación de la API de Medical Insurance")
                         .version("0.1.0")
                         .description(
                                 "En esta documentación se encuentra la información necesaria para poder interactuar con la API de Ecommerce"))
@@ -37,9 +37,6 @@ public class SwaggerConfig {
                         .addPathItem("/public/seeder", new PathItem())
                         .addPathItem("/client", new PathItem())
                         .addPathItem("/client/auth/login/whatsapp", new PathItem())
-                        .addPathItem("/files/image", new PathItem())
-                        .addPathItem("/files/{filename}", new PathItem())
-                        .addPathItem("/files", new PathItem())
                         );
     }
 }

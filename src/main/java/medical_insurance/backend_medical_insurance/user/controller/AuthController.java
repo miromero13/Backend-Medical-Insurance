@@ -1,5 +1,6 @@
 package medical_insurance.backend_medical_insurance.user.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import medical_insurance.backend_medical_insurance.common.utils.ResponseMessage;
 import medical_insurance.backend_medical_insurance.user.dto.UserLoginRequestDto;
 import medical_insurance.backend_medical_insurance.user.service.UserAuthService;
@@ -19,6 +20,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Users Auth")
 public class AuthController {
 
     @Autowired
