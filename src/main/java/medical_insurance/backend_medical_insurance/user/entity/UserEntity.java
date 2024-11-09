@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import medical_insurance.backend_medical_insurance.common.entity.BaseEntity;
 import medical_insurance.backend_medical_insurance.common.enums.GenderEnum;
-import medical_insurance.backend_medical_insurance.inventory.entity.BranchEntity;
+import medical_insurance.backend_medical_insurance.hospital.entity.BranchEntity;
 import jakarta.persistence.*;
+import medical_insurance.backend_medical_insurance.hospital.entity.DoctorEntity;
 
 @Entity
 @Table(name = "users")
@@ -41,4 +42,7 @@ public class UserEntity extends BaseEntity {
     @JoinColumn(name = "branch_id", nullable = true)
     public BranchEntity branch;
 
+    @OneToOne
+    @JoinColumn(name = "doctor_id", nullable = true)
+    public DoctorEntity doctor;
 }
