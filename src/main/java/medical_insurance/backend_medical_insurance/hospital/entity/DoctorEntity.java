@@ -18,10 +18,10 @@ public class DoctorEntity extends BaseEntity {
     @JoinColumn(name = "specialties_id", nullable = false)
     public SpecialtyEntity specialties;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "doctor_id")
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<ScheduleEntity> schedules = new ArrayList<>();
 
     @OneToOne(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     public UserEntity user;
 }
