@@ -42,6 +42,7 @@ public class UserEntity extends BaseEntity {
     @JoinColumn(name = "branch_id", nullable = true)
     public BranchEntity branch;
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "doctor_id", nullable = true)
     public DoctorEntity doctor;
