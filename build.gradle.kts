@@ -63,6 +63,9 @@ dependencies {
 
     // Google API Client and Calendar
     implementation("com.google.apis:google-api-services-calendar:v3-rev224-1.22.0")
+
+    //
+    implementation("io.github.cdimascio:dotenv-spring-boot:3.0.0")
 }
 
 tasks.withType<Test> {
