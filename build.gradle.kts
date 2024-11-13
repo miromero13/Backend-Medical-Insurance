@@ -9,7 +9,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+        languageVersion.set(JavaLanguageVersion.of(17))
 	}
 }
 
@@ -21,6 +21,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+    google()
 }
 
 dependencies {
@@ -59,6 +60,9 @@ dependencies {
 
     // Stripe payment gateway
     implementation("com.stripe:stripe-java:22.11.0")
+
+    // Google API Client and Calendar
+    implementation("com.google.apis:google-api-services-calendar:v3-rev224-1.22.0")
 }
 
 tasks.withType<Test> {

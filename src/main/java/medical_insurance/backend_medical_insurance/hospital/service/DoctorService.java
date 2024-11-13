@@ -1,20 +1,29 @@
 package medical_insurance.backend_medical_insurance.hospital.service;
 
+import medical_insurance.backend_medical_insurance.common.enums.DayEnum;
 import medical_insurance.backend_medical_insurance.common.utils.ResponseMessage;
 import medical_insurance.backend_medical_insurance.hospital.dto.DoctorDto;
 import medical_insurance.backend_medical_insurance.hospital.dto.ScheduleDto;
+import medical_insurance.backend_medical_insurance.hospital.dto.ScheduleIntervalDto;
+import medical_insurance.backend_medical_insurance.hospital.dto.WeeklyScheduleDto;
 import medical_insurance.backend_medical_insurance.hospital.entity.DoctorEntity;
 import medical_insurance.backend_medical_insurance.hospital.entity.ScheduleEntity;
 import medical_insurance.backend_medical_insurance.hospital.entity.SpecialtyEntity;
 import medical_insurance.backend_medical_insurance.hospital.repository.DoctorRepository;
 import medical_insurance.backend_medical_insurance.hospital.repository.ScheduleRepository;
 import medical_insurance.backend_medical_insurance.hospital.repository.SpecialtyRepository;
+import medical_insurance.backend_medical_insurance.service_medic.repository.AppointmentRepository;
 import medical_insurance.backend_medical_insurance.user.entity.UserEntity;
 import medical_insurance.backend_medical_insurance.user.repository.UserRepository;
+import medical_insurance.backend_medical_insurance.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,28 +38,26 @@ public class DoctorService {
     private ScheduleRepository scheduleRepository;
 
     @Autowired
-    private SpecialtyRepository specialtyRepository;
+    private SpecialtyService specialtyService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @Transactional
-    public ResponseMessage<DoctorEntity> createDoctorWithSchedules(DoctorDto doctorDto) {
+    public ResponseMessage<DoctorEntity> create(DoctorDto doctorDto) {
         try {
-            SpecialtyEntity specialty = specialtyRepository.findById(doctorDto.specialtyId)
-                    .orElseThrow(() -> new RuntimeException("Specialty not found with id: " + doctorDto.specialtyId));
-
-            UserEntity user = userRepository.findById(doctorDto.userId)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + doctorDto.userId));
-
             DoctorEntity doctor = new DoctorEntity();
             doctor.licenseNumber = doctorDto.licenseNumber;
-            doctor.specialties = specialty;
+            doctor.specialties = specialtyService.getOneById(doctorDto.specialtyId);
+            UserEntity user = userService.getUserById(doctorDto.userId);
             doctor.user = user;
+            user.doctor = doctor;
 
             doctor = doctorRepository.save(doctor);
 
-            // Associate schedules (create new schedules if they don't exist)
             if (doctorDto.scheduleIds != null) {
                 for (ScheduleDto scheduleDto : doctorDto.scheduleIds) {
                     ScheduleEntity schedule = new ScheduleEntity();
@@ -59,20 +66,18 @@ public class DoctorService {
                     schedule.endTime = scheduleDto.endTime;
 
                     schedule = scheduleRepository.save(schedule);
+                    doctor.schedules.add(schedule);
                 }
             }
 
-            // Save doctor with schedules
-            doctorRepository.save(doctor);
-
-            return ResponseMessage.success(doctor, "Doctor created with schedules successfully", 1);
+            return ResponseMessage.success(doctor, "Doctor created successfully", 1);
 
         } catch (Exception ex) {
             throw new RuntimeException("Error while creating doctor: " + ex.getMessage());
         }
     }
 
-    public ResponseMessage<List<DoctorEntity>> getAllDoctors() {
+    public ResponseMessage<List<DoctorEntity>> getAll() {
         try {
             List<DoctorEntity> doctors = doctorRepository.findAll();
             return ResponseMessage.success(doctors, "Doctors retrieved successfully", doctors.size());
@@ -81,9 +86,9 @@ public class DoctorService {
         }
     }
 
-    public DoctorEntity getOneDoctor(UUID id) {
+    public DoctorEntity getOneById(UUID id) {
         try {
-            return doctorRepository.findById(id)
+            return doctorRepository.findByIdWithUser(id)
                     .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + id));
         } catch (Exception ex) {
             throw new RuntimeException("Doctor not found with id: " + id);
@@ -91,7 +96,7 @@ public class DoctorService {
     }
 
     @Transactional
-    public ResponseMessage<Void> deleteDoctor(UUID id) {
+    public ResponseMessage<Void> delete(UUID id) {
         try {
             DoctorEntity doctor = doctorRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + id));
@@ -105,15 +110,14 @@ public class DoctorService {
     }
 
     @Transactional
-    public ResponseMessage<DoctorEntity> updateDoctor(UUID id, Optional<DoctorDto> doctorDto) {
+    public ResponseMessage<DoctorEntity> update(UUID id, Optional<DoctorDto> doctorDto) {
         try {
             DoctorEntity doctor = doctorRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + id));
 
             doctorDto.ifPresent(dto -> {
                 if (dto.specialtyId != null) {
-                    doctor.specialties = specialtyRepository.findById(dto.specialtyId)
-                            .orElseThrow(() -> new RuntimeException("Specialty not found"));
+                    doctor.specialties = specialtyService.getOneById(dto.specialtyId);
                 }
 
                 if (dto.scheduleIds != null) {
@@ -136,6 +140,55 @@ public class DoctorService {
 
         } catch (Exception ex) {
             return ResponseMessage.error("Error while updating: " + ex.getMessage(), 500);
+        }
+    }
+
+    public ResponseMessage<List<WeeklyScheduleDto>> getDoctorWeeklyAvailability(UUID doctorId) {
+        try {
+            DoctorEntity doctor = doctorRepository.findById(doctorId)
+                    .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + doctorId));
+
+            LocalDate startDate = LocalDate.now();
+            List<WeeklyScheduleDto> weeklyAvailability = new ArrayList<>();
+
+            for (int i = 0; i < 7; i++) { // Loop through 7 days for one week
+                LocalDate currentDay = startDate.plusDays(i);
+                DayEnum currentDayOfWeek = DayEnum.valueOf(currentDay.getDayOfWeek().toString());
+
+                List<ScheduleEntity> schedules = scheduleRepository.findByDoctorIdAndDayOfWeek(doctorId, currentDayOfWeek);
+
+                List<ScheduleIntervalDto> dailyIntervals = new ArrayList<>();
+
+                for (ScheduleEntity schedule : schedules) {
+                    LocalTime time = schedule.startTime;
+                    while (!time.isAfter(schedule.endTime)) {
+                        LocalDateTime dateTimeSlot = currentDay.atTime(time);
+                        boolean isAvailable = appointmentRepository
+                                .findByDoctorIdAndAppointmentDate(doctorId, dateTimeSlot)
+                                .isEmpty();
+
+                        ScheduleIntervalDto interval = new ScheduleIntervalDto();
+                        interval.startTime = time;
+                        interval.endTime = time.plusMinutes(30);
+                        interval.isAvailable = isAvailable;
+
+                        dailyIntervals.add(interval);
+
+                        time = time.plusMinutes(30);
+                    }
+                }
+
+                WeeklyScheduleDto dailySchedule = new WeeklyScheduleDto();
+                dailySchedule.date = currentDay;
+                dailySchedule.day = currentDay.getDayOfWeek().toString(); // Add day name
+                dailySchedule.hours = dailyIntervals; // List of intervals
+
+                weeklyAvailability.add(dailySchedule);
+            }
+
+            return ResponseMessage.success(weeklyAvailability, "Weekly doctor availability retrieved successfully", weeklyAvailability.size());
+        } catch (Exception ex) {
+            return ResponseMessage.error("Error retrieving doctor weekly availability: " + ex.getMessage(), 500);
         }
     }
 }

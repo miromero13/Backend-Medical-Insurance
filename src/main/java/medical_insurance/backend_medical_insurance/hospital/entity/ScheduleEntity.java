@@ -21,4 +21,9 @@ public class ScheduleEntity extends BaseEntity {
 
     @Column(nullable = false)
     public LocalTime endTime;
+
+    @ManyToOne
+    @JoinColumn(name = "doctor_id", nullable = false)
+    @JsonIgnore
+    public DoctorEntity doctor;
 }
